@@ -6,3 +6,5 @@ Dockerfile
 .gitignore
 *.md
 *.log
+**/node_modules
+.git

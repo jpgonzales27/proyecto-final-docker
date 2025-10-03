@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: self-hosted # porque el PDF pide self-hosted runner con Docker
+    runs-on: self-hosted
 
     steps:
       - name: Checkout repo
