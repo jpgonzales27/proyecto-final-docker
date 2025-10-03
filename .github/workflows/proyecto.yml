@@ -1,0 +1,42 @@
+name: Final Project CI Pipeline
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build-and-test:
+    runs-on: self-hosted # porque el PDF pide self-hosted runner con Docker
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Tag Docker Image
+        run: |
+          docker build -f ./Dockerfile \
+          -t "${{ secrets.DOCKER_USERNAME }}/project-node:latest" .
+
+      - name: Push to Docker Hub
+        run: docker push "${{ secrets.DOCKER_USERNAME }}/project-node:latest"
+
+      - name: Run container
+        run: docker run -d -p 3000:3000 --name test-container ${{ secrets.DOCKER_USERNAME }}/node-docker-app:latest
+
+      - name: Wait for container
+        run: sleep 5
+
+      - name: Test container with curl
+        run: curl --fail http://localhost:3000 | grep "Hola Mundo"
+
+      - name: Stop and remove container
+        if: always()
+        run: docker rm -f test-container
