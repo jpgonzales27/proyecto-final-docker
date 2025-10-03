@@ -23,7 +23,11 @@ jobs:
       - name: Prepare build context
         run: |
           mkdir context
-          cp app.js package.json Dockerfile context/
+          Copy-Item app.js context/
+          Copy-Item package.json context/
+          if (Test-Path package-lock.json) { Copy-Item package-lock.json context/ }
+          Copy-Item Dockerfile context/
+          Get-ChildItem context
 
       - name: Build and Tag Docker Image
         run: |
